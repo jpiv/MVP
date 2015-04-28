@@ -35,9 +35,9 @@ socket.on('begin round', function(data){
           team[$(this).text()] = 0;
         });
         if(Object.keys(team).length === data.limit){
-          $('#teamSend').show();
+          $('.team').show();
         } else {
-          $('#teamSend').hide();
+          $('.team').hide();
         }
       }));
   };
@@ -59,32 +59,28 @@ socket.on('run', function(sentTeam){
 });
 
 // jQuery
-$('#rolebutton').on('mouseenter', function(){
-  $('#role').show();
-});
-$('#rolebutton').on('mouseleave', function(){
-  $('#role').hide();
+$('#rolebutton').on('click', function(){
+  $('#role').slideToggle();
 });
 
-$('#spiesbutton').on('mouseenter', function(){
-  $('#spies').show();
-});
-$('#spiesbutton').on('mouseleave', function(){
-  $('#spies').hide();
+$('#spiesbutton').on('click', function(){
+  $('#spies').slideToggle();
 });
 
 
 $('#join').on('click', function(){
-  $('.join').hide();
-  $('#begin').show();
+  $('.join').fadeOut('fast', function(){
+    $('.begin').fadeIn();
+  });
   socket.emit('join', $('#username').val());
 });
 
-$('#begin').on('click', function(){
+$('.begin button').on('click', function(){
+  $('.begin').hide();
   socket.emit('begin game');
 });
 
-$('#teamSend').on('click', function(){
+$('.team').on('click', function(){
   socket.emit('team', Object.keys(team));
 });
 

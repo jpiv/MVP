@@ -24,6 +24,10 @@ app.get('/client/client.js', function(req, res){
   res.sendFile(__dirname + '/client/client.js');
 });
 
+app.get('/client/logo.png', function(req, res){
+  res.sendFile(__dirname + '/client/logo.png');
+});
+
 // ================================
 // settings
 // ================================
@@ -79,11 +83,11 @@ io.sockets.on('connect', function(player){
     // create deck
     while(i < game.count){
       if(i < spy){
-        deck.push('spy');
+        deck.push('Spy');
       } else if(i === spy) {
-        deck.push('merlin');
+        deck.push('Merlin');
       } else {
-        deck.push('loyal');
+        deck.push('Knight of the Round');
       }
       i++;
     }
@@ -95,7 +99,7 @@ io.sockets.on('connect', function(player){
     for(var name in game.players){
       if(game.players[name]){
         game.players[name].push(deck.pop());
-        if(game.players[name][1] === 'spy'){
+        if(game.players[name][1] === 'Spy'){
           game.spys.push(name);
         }
       }
@@ -109,7 +113,7 @@ io.sockets.on('connect', function(player){
           users: Object.keys(game.players),
           limit: calcLimit()
         };
-        if(data.role === 'spy' || data.role === 'merlin'){
+        if(data.role === 'spy' || data.role === 'Merlin'){
           data.spys = game.spys;
         }
         game.players[name][0].emit('begin round', data);
