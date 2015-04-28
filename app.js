@@ -3,31 +3,44 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var _ = require('underscore');
 
+// create route to index.html
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/client/index.html');
-}); 
+});
 
-var players = {};
-var playerCount = 0;
-var spys = [];
+// set settings object
+var settings = {
+  players: {},
+  team: [],
+  rounds: [],
+  votes: [],
+  spys: [],
+  count: 0,
+  yes: 0,
+  no: 0,
+  pass: 0,
+  fail: 0
+};
 
+// connect to sockets
 io.sockets.on('connect', function(player){
 
 
-  // join listener
+  // when a player joins
   player.on('join', function(username){
-    players[username] = [];
-    players[username][0] = player;
-    playerCount++;
-    console.log(players);
+    settings.players[username] = [];
+    settings.players[username][0] = player;
+    settings.count++;
   });
 
-  // begin listener
+  // when the game begins
   player.on('begin', function(){
     var deck = [];
-    var spy = Math.ceil(playerCount / 2 - 1);
+    var spy = Math.ceil(settings.count / 2 - 1);
     var i = 0;
-    while(i < playerCount){
+
+    // create deck
+    while(i < settings.count){
       if(i < spy){
         deck.push('spy');
       } else if(i === spy) {
@@ -37,82 +50,100 @@ io.sockets.on('connect', function(player){
       }
       i++;
     }
+
+    // shuffle deck
     deck = _.shuffle(deck);
     
-    for(var name in players){
-      players[name].push(deck.pop());
-      if(players[name][1] === 'spy'){
-        spys.push(name);
+    // deal deck
+    for(var name in settings.players){
+      if(settings.players[name]){
+        settings.players[name].push(deck.pop());
+        if(settings.players[name][1] === 'spy'){
+          settings.spys.push(name);
+        }
       }
     }
-    console.log(spys);
 
-    for(var name in players){
+    // send rolls and spy list where necessary
+    for(var name in settings.players){
       var data = {
-        roll: players[name][1],
-        users: Object.keys(players)
+        roll: settings.players[name][1],
+        users: Object.keys(settings.players)
       };
       if(data.roll === 'spy' || data.roll === 'merlin'){
-        data.spyList = spys;
+        data.spys = settings.spys;
       }
       console.log(data);
-      players[name][0].emit('begin', data);
+      settings.players[name][0].emit('begin', data);
     }
   });
 
-  player.on('team', function(){
 
+  // when a team is proposed, ask for a vote
+  player.on('team', function(team){
+    console.log(team);
+    io.emit('voting');
   });
 
-  player.on('team vote', function(){
-
+  // tally votes when recieved
+  player.on('voteTeam', function(vote){
+    if(vote === 'yes'){
+      settings.yes++;
+    } else {
+      settings.no++;
+    };
+    if(settings.yes + settings.no === settings.count){
+      if(settings.yes >= settings.no){
+        console.log('pass!');
+      } else {
+        console.log('fail')
+      }
+      settings.yes = 0;
+      settings.no = 0;
+    }
   });
 
-  player.on('succeed/fail', function(){
-
-  });
-
-  player.on('succeed', function(){
-
+  // when the mission is run, decide fail or pass
+  player.on('runMission', function(run){
+    if(run === 'yes'){
+      settings.yes++;
+    } else {
+      settings.no++;
+    };
+    if(settings.yes + settings.no === team.length){
+      settings.rounds.push([settings.yes, settings.no]);
+      if(settings.no !== 0){
+        settings.fail++;
+        if(settings.fail === 3){
+          console.log('LOST');
+        }
+        console.log('fail!', [settings.yes, settings.no]);
+      } else {
+        settings.pass++;
+        if(settings.pass === 3){
+          console.log('WON!');
+        }
+        console.log('pass!');
+      }
+      settings.yes = 0;
+      settings.no = 0;
+    };
+    if(settings.rounds.length < 5){
+      io.emit('begin');
+    }
   });
 
   // disconnect listener
   player.on('disconnect', function(){
-    for(var name in players){
-      if(players[name] && players[name][0] === player){
-        players[name] = null;
+    for(var name in settings.players){
+      if(settings.players[name] && settings.players[name][0] === player){
+        settings.players[name] = null;
       }
     }
   });
 });
 
-
-/*
-- ons:
-connect - check
-join - check
-begin - check
-team
-team vote
-s/f
-disconnect
-
-- emits:
-begin - check
-team
-team pass
-team fail
-mission pass
-mission fail
-
-
-
-
-*/
-
-
 // begin listening
-
-http.listen(3000, function(){
+http.listen(2000, function(){
   console.log("we're always listening!");
 });
