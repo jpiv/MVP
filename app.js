@@ -45,7 +45,8 @@ var game = {
   yeses: [],
   nos: [],
   pass: 0,
-  fail: 0
+  fail: 0,
+  failedTeam: 0
 };
 
 // ================================
@@ -113,7 +114,7 @@ io.sockets.on('connect', function(player){
           users: Object.keys(game.players),
           limit: calcLimit()
         };
-        if(data.role === 'spy' || data.role === 'Merlin'){
+        if(data.role === 'Spy' || data.role === 'Merlin'){
           data.spys = game.spys;
         }
         game.players[name][0].emit('begin round', data);
@@ -131,22 +132,21 @@ io.sockets.on('connect', function(player){
   // tally votes when recieved
   player.on('voteTeam', function(vote){
     if(vote === 'yes'){
-      game.nos.push(player);
+      game.yeses.push(player);
       game.yes++;
     } else {
       game.nos.push(player);
       game.no++;
     };
-    console.log(game.nos);
     if(game.yes + game.no === game.count){
       if(game.yes >= game.no){
-        console.log(game.team);
-        console.log('pass!');
+        game.failedTeam = 0;
         for (var i = 0; i < game.team.length; i++) {
           game.players[game.team[i]][0].emit('run', game.team);
         };
       } else {
-        console.log('fail')
+        game.failedTeam++;
+        io.sockets.emit('begin round');
       }
       game.yes = 0;
       game.no = 0;
@@ -184,7 +184,7 @@ io.sockets.on('connect', function(player){
       }
       if(game.rounds.length < 5){
         console.log('begin new round');
-        io.sockets.emit('begin round', { users: Object.keys(game.players), limit: calcLimit() });
+        io.sockets.emit('begin round', { users: Object.keys(game.players), limit: calcLimit(), score: game.rounds });
       }
     };
   });

@@ -41,6 +41,9 @@ body{
 .full{
   width: 100%;
 }
+.half{
+  width: 50%;
+}
 form input {
   border: 0;
   padding: 10px;
@@ -48,9 +51,12 @@ form input {
   float: left;
 }
 button {
-  background: rgb(130, 224, 255); 
+  background: #82E0FF; 
   border: none; 
   padding: 10px;
+}
+button:hover{
+  background: #61A8BF;
 }
 form button { 
   width: 8%; 
@@ -71,14 +77,8 @@ button:hover {
   padding: 12px;
   background: #f1f1f1;
 }
-.half{
-  position: fixed;
-  width: 33%;
-  left: 11%;
-  top: 30%;
-}
 .first{
-  left: 55%;
+  float: left;
 }
 #role{
   padding: 15px;

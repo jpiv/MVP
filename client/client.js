@@ -2,13 +2,21 @@ var socket = io(), team, role, spys, limit;
 
 // Socket.io
 socket.on('begin round', function(data){
-  $('#begin').hide();
-    
+  $('.begin').hide();
+
+  if(data.score){ 
+  var lastRound = data.score.length
+  $('#board').append($('<div>')
+    .text('Round :' + lastRound + ', Successes: ' + data.score[lastRound - 1][0] + ', Fails: ' + data.score[lastRound - 1][1])
+    .addClass('user'));
+  }
+  
   if(data.role){
     role = data.role;
     $('#role').text(role);
     $('#rolebutton').show();
   }
+  
   if(data.spys){
     $('#spiesbutton').show();
     for (var i = 0; i < data.spys.length; i++) {
@@ -44,6 +52,7 @@ socket.on('begin round', function(data){
 });
 
 socket.on('voting', function(sentTeam){
+  $('.team').hide();
   $('#users').empty();
   for (var i = 0; i < sentTeam.length; i++) {
     $('#users').append($('<div>')
@@ -67,6 +76,9 @@ $('#spiesbutton').on('click', function(){
   $('#spies').slideToggle();
 });
 
+$('#boardbutton').on('click', function(){
+  $('#board').slideToggle();
+});
 
 $('#join').on('click', function(){
   $('.join').fadeOut('fast', function(){
