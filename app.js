@@ -3,13 +3,33 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var _ = require('underscore');
 
-// create route to index.html
+// begin listening
+http.listen(2000, function(){
+  console.log("we're always listening!");
+});
+
+// ================================
+// router
+// ================================
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/client/index.html');
 });
 
-// set settings object
-var settings = {
+app.get('/client/style.css', function(req, res){
+  res.sendFile(__dirname + '/client/style.css');
+});
+
+app.get('/client/client.js', function(req, res){
+  res.sendFile(__dirname + '/client/client.js');
+});
+
+// ================================
+// settings
+// ================================
+
+// set game object
+var game = {
   players: {},
   team: [],
   rounds: [],
@@ -22,25 +42,40 @@ var settings = {
   fail: 0
 };
 
-// connect to sockets
+// ================================
+// socket.io
+// ================================
+
 io.sockets.on('connect', function(player){
 
 
+  var calcLimit = function(){
+    var perfectGame = Object.keys(game.players).length - game.spys.length;
+    var round = game.rounds.length + 1;
+    if(round === 1){
+      return perfectGame - 2;
+    } else if(round < 4) {
+      return perfectGame - 1;
+    } else {
+      return perfectGame;
+    }
+  };
+
   // when a player joins
   player.on('join', function(username){
-    settings.players[username] = [];
-    settings.players[username][0] = player;
-    settings.count++;
+    game.players[username] = [];
+    game.players[username][0] = player;
+    game.count++;
   });
 
   // when the game begins
-  player.on('begin', function(){
+  player.on('begin game', function(){
     var deck = [];
-    var spy = Math.ceil(settings.count / 2 - 1);
+    var spy = Math.ceil(game.count / 2 - 1);
     var i = 0;
 
     // create deck
-    while(i < settings.count){
+    while(i < game.count){
       if(i < spy){
         deck.push('spy');
       } else if(i === spy) {
@@ -55,95 +90,99 @@ io.sockets.on('connect', function(player){
     deck = _.shuffle(deck);
     
     // deal deck
-    for(var name in settings.players){
-      if(settings.players[name]){
-        settings.players[name].push(deck.pop());
-        if(settings.players[name][1] === 'spy'){
-          settings.spys.push(name);
+    for(var name in game.players){
+      if(game.players[name]){
+        game.players[name].push(deck.pop());
+        if(game.players[name][1] === 'spy'){
+          game.spys.push(name);
         }
       }
     }
 
     // send rolls and spy list where necessary
-    for(var name in settings.players){
+    for(var name in game.players){
       var data = {
-        roll: settings.players[name][1],
-        users: Object.keys(settings.players)
+        role: game.players[name][1],
+        users: Object.keys(game.players),
+        limit: calcLimit()
       };
-      if(data.roll === 'spy' || data.roll === 'merlin'){
-        data.spys = settings.spys;
+      if(data.role === 'spy' || data.role === 'merlin'){
+        data.spys = game.spys;
       }
-      console.log(data);
-      settings.players[name][0].emit('begin', data);
+      game.players[name][0].emit('begin round', data);
     }
   });
 
-
   // when a team is proposed, ask for a vote
   player.on('team', function(team){
+    game.team = team;
     console.log(team);
-    io.emit('voting');
+    io.emit('voting', team);
   });
 
   // tally votes when recieved
   player.on('voteTeam', function(vote){
     if(vote === 'yes'){
-      settings.yes++;
+      game.yes++;
     } else {
-      settings.no++;
+      game.no++;
     };
-    if(settings.yes + settings.no === settings.count){
-      if(settings.yes >= settings.no){
+    if(game.yes + game.no === game.count){
+      if(game.yes >= game.no){
+        console.log(game.team);
         console.log('pass!');
+        for (var i = 0; i < game.team.length; i++) {
+          game.players[game.team[i]][0].emit('run', game.team);
+        };
       } else {
         console.log('fail')
       }
-      settings.yes = 0;
-      settings.no = 0;
+      game.yes = 0;
+      game.no = 0;
     }
   });
 
   // when the mission is run, decide fail or pass
-  player.on('runMission', function(run){
+  player.on('run mission', function(run){
     if(run === 'yes'){
-      settings.yes++;
+      game.yes++;
     } else {
-      settings.no++;
-    };
-    if(settings.yes + settings.no === team.length){
-      settings.rounds.push([settings.yes, settings.no]);
-      if(settings.no !== 0){
-        settings.fail++;
-        if(settings.fail === 3){
+      game.no++;
+    }
+    if(game.yes + game.no === game.team.length){
+      game.rounds.push([game.yes, game.no]);
+      console.log(game.rounds, game.pass, game.fail);
+      if(game.no !== 0){
+        game.fail++;
+        if(game.fail === 3){
           console.log('LOST');
         }
-        console.log('fail!', [settings.yes, settings.no]);
+        console.log('fail!', [game.yes, game.no]);
       } else {
-        settings.pass++;
-        if(settings.pass === 3){
+        game.pass++;
+        if(game.pass === 3){
           console.log('WON!');
         }
         console.log('pass!');
       }
-      settings.yes = 0;
-      settings.no = 0;
+      game.yes = 0;
+      game.no = 0;
+      if(game.fail === 3){
+        console.log('LOST');
+      }
+      if(game.rounds.length < 5){
+        console.log('begin new round');
+        io.sockets.emit('begin round', { users: Object.keys(game.players), limit: calcLimit() });
+      }
     };
-    if(settings.rounds.length < 5){
-      io.emit('begin');
-    }
   });
 
   // disconnect listener
   player.on('disconnect', function(){
-    for(var name in settings.players){
-      if(settings.players[name] && settings.players[name][0] === player){
-        settings.players[name] = null;
+    for(var name in game.players){
+      if(game.players[name] && game.players[name][0] === player){
+        game.players[name] = null;
       }
     }
   });
-});
-
-// begin listening
-http.listen(2000, function(){
-  console.log("we're always listening!");
 });
