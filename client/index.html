@@ -1,45 +1,36 @@
 <!doctype html>
 <html>
-  <head>
-    <title>RESISTENCE</title>
-    <link rel="stylesheet" type="text/css" href="/client/style.css">
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-  </head>
-  <body>
-  <div id="info">
-    
+<head>
+  <title>RESISTENCE</title>
+  <link rel='stylesheet' type='text/css' href='/client/style.css'>
+  <script src='/socket.io/socket.io.js'></script>
+  <script src='http://code.jquery.com/jquery-1.11.1.js'></script>
+</head>
+<body>
+  <div id='info'>
     <form class='join'>
-      <input id="username"><button id='join' type='button'>join</button>
+      <input id='username'><button id='join' type='button'>join</button>
     </form>
-
-    <div class="response">
-      <button class='vote' id='yes' type='button'>YES</button>
-      <button class='vote' id='no' type='button'>NO</button>
+    <div class='response'>
+      <button class='vote half hidden first' id='yes' type='button'>YES</button>
+      <button class='vote half hidden' id='no' type='button'>NO</button>
     </div>
-
-    <div class="response">
-      <button class='run' id='succeed' type='button'>Succeed</button>
-      <button class='run' id='fail' type='button'>Fail</button>
+    <div class='response'>
+      <button class='run half hidden first' id='succeed' type='button'>Succeed</button>
+      <button class='run half hidden' id='fail' type='button'>Fail</button>
     </div>
-
-    <button id="begin">Begin Game</button>
+    <button id='begin' class='full hidden'>Begin Game</button>
+    <button id='teamSend' class='full hidden' type='button'>Send Team</button>
   </div>
-
-    <div id='users'></div>
-
-    <button id='teamSend' type='button'>Send Team</button>
-
-    <div class='data'>
-      <div id='role'></div>
-      <div id='rolebutton'>SEE ROLE</div>
-    </div>
-
-    <div class="data">
-      <div id='spies'></div>
-      <div id='spiesbutton'>SEE SPIES</div>
-    </div>
-
-    <script type="text/javascript" src="/client/client.js"></script>
-  </body>
+  <div id='users'></div>
+  <div class='data role'>
+    <div id='role' class='hidden'></div>
+    <button id='rolebutton' class='hidden'>SEE ROLE</button>
+  </div>
+  <div class='data spies'>
+    <div id='spies' class='hidden'></div>
+    <button id='spiesbutton' class='hidden'>SEE SPIES</button>
+  </div>
+  <script type='text/javascript' src='/client/client.js'></script>
+</body>
 </html>

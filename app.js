@@ -38,6 +38,8 @@ var game = {
   count: 0,
   yes: 0,
   no: 0,
+  yeses: [],
+  nos: [],
   pass: 0,
   fail: 0
 };
@@ -101,15 +103,17 @@ io.sockets.on('connect', function(player){
 
     // send rolls and spy list where necessary
     for(var name in game.players){
-      var data = {
-        role: game.players[name][1],
-        users: Object.keys(game.players),
-        limit: calcLimit()
-      };
-      if(data.role === 'spy' || data.role === 'merlin'){
-        data.spys = game.spys;
+      if(game.players[name]){
+        var data = {
+          role: game.players[name][1],
+          users: Object.keys(game.players),
+          limit: calcLimit()
+        };
+        if(data.role === 'spy' || data.role === 'merlin'){
+          data.spys = game.spys;
+        }
+        game.players[name][0].emit('begin round', data);
       }
-      game.players[name][0].emit('begin round', data);
     }
   });
 
@@ -123,10 +127,13 @@ io.sockets.on('connect', function(player){
   // tally votes when recieved
   player.on('voteTeam', function(vote){
     if(vote === 'yes'){
+      game.nos.push(player);
       game.yes++;
     } else {
+      game.nos.push(player);
       game.no++;
     };
+    console.log(game.nos);
     if(game.yes + game.no === game.count){
       if(game.yes >= game.no){
         console.log(game.team);
@@ -157,6 +164,7 @@ io.sockets.on('connect', function(player){
         if(game.fail === 3){
           console.log('LOST');
         }
+        io.sockets.emit('fail')
         console.log('fail!', [game.yes, game.no]);
       } else {
         game.pass++;

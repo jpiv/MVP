@@ -32,7 +32,7 @@ socket.on('begin round', function(data){
         $(this).toggleClass('selected');
         team = {};
         $('.selected').each(function(user){
-            team[$(this).text()] = 0;
+          team[$(this).text()] = 0;
         });
         if(Object.keys(team).length === data.limit){
           $('#teamSend').show();
@@ -73,8 +73,10 @@ $('#spiesbutton').on('mouseleave', function(){
   $('#spies').hide();
 });
 
+
 $('#join').on('click', function(){
   $('.join').hide();
+  $('#begin').show();
   socket.emit('join', $('#username').val());
 });
 
