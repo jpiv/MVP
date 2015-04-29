@@ -3,8 +3,9 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var _ = require('underscore');
 
-// begin listening
-http.listen(2000, function(){
+var port = process.env.PORT || 3000 // begin listening
+
+http.listen(port, function(){
   console.log("we're always listening!");
 });
 
