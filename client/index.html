@@ -3,7 +3,20 @@
 <head>
   <title>RESISTENCE</title>
   <link rel='stylesheet' type='text/css' href='/client/style.css'>
-  <link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Slabo+27px::latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+  </script>
   <script src='/socket.io/socket.io.js'></script>
   <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
 </head>
