@@ -3,28 +3,28 @@ app.controller('MainCtrl', ['$scope', 'socket', function($scope, socket){
 
   $scope.join = function(username){
     socket.emit('join', username);
-    $('#join').hide();
+    $('#join').fadeOut();
     $('#begin').show();
   };
 
   $scope.beginGame = function(){
-    $('#begin').hide();
+    $('#begin').fadeOut();
     socket.emit('beginGame');
   };
 
   $scope.submitTeam = function(){
-    $('#teamview').hide();
+    $('#teamview').fadeOut();
     $('#vote').show();
     socket.emit('submitTeam', team);
   };
 
   $scope.submitVote = function(){
-    $('#vote').hide();
+    $('#vote').fadeOut();
     socket.emit('submitVote', vote);
   };
 
   $scope.submitRun = function(){
-    $('#teamview').hide();
+    $('#teamview').fadeOut();
     $('#vote').show();
     socket.emit('submitTeam', team);
   };

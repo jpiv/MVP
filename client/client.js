@@ -2,7 +2,8 @@ var socket = io(), team, role, spys, limit;
 
 // Socket.io
 socket.on('begin round', function(data){
-  $('.begin').hide();
+  $('.begin').fadeOut();
+  $('#response').fadeIn();
 
   if(data.score){ 
   var lastRound = data.score.length
@@ -14,11 +15,11 @@ socket.on('begin round', function(data){
   if(data.role){
     role = data.role;
     $('#role').text(role);
-    $('#rolebutton').show();
+    $('#rolebutton').fadeIn();
   }
   
   if(data.spys){
-    $('#spiesbutton').show();
+    $('#spiesbutton').fadeIn();
     for (var i = 0; i < data.spys.length; i++) {
     $('#spies').append($('<div>')
       .text(data.spys[i])
@@ -43,28 +44,28 @@ socket.on('begin round', function(data){
           team[$(this).text()] = 0;
         });
         if(Object.keys(team).length === data.limit){
-          $('.team').show();
+          $('.team').fadeIn();
         } else {
-          $('.team').hide();
+          $('.team').fadeOut();
         }
       }));
   }
 });
 
 socket.on('voting', function(sentTeam){
-  $('.team').hide();
+  $('.team').fadeOut();
   $('#users').empty();
   for (var i = 0; i < sentTeam.length; i++) {
     $('#users').append($('<div>')
       .text(sentTeam[i])
       .addClass('user'));
   }
-  $('#teamSend').hide();
-  $('.vote').show();
+  $('#teamSend').fadeOut();
+  $('.vote').fadeIn();
 });
 
 socket.on('run', function(sentTeam){
-  $('.run').show();
+  $('.run').fadeIn();
 });
 
 // jQuery
@@ -80,15 +81,19 @@ $('#boardbutton').on('click', function(){
   $('#board').slideToggle();
 });
 
-$('#join').on('click', function(){
+$('#join').on('submit', function(){
+  console.log('SENT')
+  $('h1').fadeOut();
   $('.join').fadeOut('fast', function(){
     $('.begin').fadeIn();
   });
   socket.emit('join', $('#username').val());
+  return false;
 });
 
 $('.begin button').on('click', function(){
-  $('.begin').hide();
+  // $('.begin').fadeOut();
+  $('#boaedbutton').fadeIn();
   socket.emit('begin game');
 });
 
@@ -97,24 +102,24 @@ $('.team').on('click', function(){
 });
 
 $('#yes').on('click', function(){
-  $('.vote').hide();
+  $('.vote').fadeOut();
   $('#users').empty();
   socket.emit('voteTeam', 'yes');
 });
 
 $('#no').on('click', function(){
-  $('.vote').hide();
+  $('.vote').fadeOut();
   socket.emit('voteTeam', 'no');
 });
 
 $('#succeed').on('click', function(){
-  $('.run').hide();
+  $('.run').fadeOut();
   socket.emit('run mission', 'yes');
 });
 
 $('#fail').on('click', function(){
   if(role === 'spy'){
-    $('.run').hide();
+    $('.run').fadeOut();
     socket.emit('run mission', 'no');
   }
 });

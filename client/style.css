@@ -9,7 +9,31 @@ body{
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  font: 13px Helvetica, Arial;
+  font-family: 'Slabo 27px', serif;
+}
+h1{
+  width: 100%;
+  text-align: center;
+  text-shadow: -4px 4px #c9c9c9;
+  margin-top: -0px;
+  padding: 0;
+  position: fixed;
+  font-size: 120px;
+  letter-spacing: 10px;
+  color: #82E0FF;
+}
+.begin{
+  background: #f1f1f1;
+  border-radius: 2px;
+  border: 12px;
+  position: fixed;
+  left: 30%;
+  width: 40%;
+  top: 40%;
+}
+.begin button{
+  font-size: 25px;
+  color: #fff;
 }
 #container{
   position: fixed;
@@ -44,25 +68,59 @@ body{
 .half{
   width: 50%;
 }
+form {
+  position: fixed;
+  width: 30%;
+  top: 40%;
+  left: 35%;
+}
 form input {
-  border: 0;
-  padding: 10px;
-  width: 90%;
-  float: left;
+  font-family: 'Slabo 27px', serif;
+  color: white;
+  font-size: 25pt;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 2px solid #f1f1f1;
+}
+input::-webkit-input-placeholder {
+  text-align: center;
+  letter-spacing: 2px;
+  color: #c9c9c9;
+  font-weight: lighter;
+  text-transform: uppercase;
+}
+input::-moz-placeholder {
+  text-align: center;
+  letter-spacing: 2px;
+  color: #c9c9c9;
+  font-weight: lighter;
+  text-transform: uppercase;
+}
+input:-moz-placeholder {   /* Older versions of Firefox */
+  text-align: center;
+  color: #c9c9c9;
+  font-weight: lighter;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+input:-ms-input-placeholder { 
+  text-align: center;
+  letter-spacing: 2px;
+  color: #c9c9c9;
+  font-weight: lighter;
+  text-transform: uppercase;
 }
 button {
+  font-family: 'Slabo 27px', serif;
   background: #82E0FF; 
   border: none; 
+  letter-spacing: 2px;
+  font-size: 15px;
   padding: 10px;
 }
 button:hover{
-  background: #61A8BF;
-}
-form button { 
-  width: 8%; 
-}
-button:hover {
-  background: #red;
+  background: #c9c9c9;
 }
 .user {
   margin-bottom: 7px;
