@@ -108,17 +108,17 @@ io.sockets.on('connect', function(player){
     }
 
     // send rolls and spy list where necessary
-    for(var name in game.players){
-      if(game.players[name]){
+    for(var name2 in game.players){
+      if(game.players[name2]){
         var data = {
-          role: game.players[name][1],
+          role: game.players[name2][1],
           users: Object.keys(game.players),
           limit: calcLimit()
         };
         if(data.role === 'Spy' || data.role === 'Merlin'){
           data.spys = game.spys;
         }
-        game.players[name][0].emit('begin round', data);
+        game.players[name2][0].emit('begin round', data);
       }
     }
   });
@@ -138,13 +138,13 @@ io.sockets.on('connect', function(player){
     } else {
       game.nos.push(player);
       game.no++;
-    };
+    }
     if(game.yes + game.no === game.count){
       if(game.yes >= game.no){
         game.failedTeam = 0;
         for (var i = 0; i < game.team.length; i++) {
           game.players[game.team[i]][0].emit('run', game.team);
-        };
+        }
       } else {
         game.failedTeam++;
         io.sockets.emit('begin round');
@@ -187,7 +187,7 @@ io.sockets.on('connect', function(player){
         console.log('begin new round');
         io.sockets.emit('begin round', { users: Object.keys(game.players), limit: calcLimit(), score: game.rounds });
       }
-    };
+    }
   });
 
   // disconnect listener

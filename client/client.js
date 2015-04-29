@@ -32,9 +32,9 @@ socket.on('begin round', function(data){
   console.log(limit);
   $('#users').empty();
 
-  for (var i = 0; i < data.users.length; i++) {
+  for (var j = 0; j < data.users.length; j++) {
     $('#users').append($('<div>')
-      .text(data.users[i])
+      .text(data.users[j])
       .addClass('user')
       .on('click', function(){
         $(this).toggleClass('selected');
@@ -48,7 +48,7 @@ socket.on('begin round', function(data){
           $('.team').hide();
         }
       }));
-  };
+  }
 });
 
 socket.on('voting', function(sentTeam){
@@ -58,7 +58,7 @@ socket.on('voting', function(sentTeam){
     $('#users').append($('<div>')
       .text(sentTeam[i])
       .addClass('user'));
-  };
+  }
   $('#teamSend').hide();
   $('.vote').show();
 });
