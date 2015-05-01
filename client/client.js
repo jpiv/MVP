@@ -6,10 +6,19 @@ socket.on('begin round', function(data){
   $('#response').fadeIn();
 
   if(data.score){ 
-  var lastRound = data.score.length
+  $('#boardbutton').fadeIn();
+
+  var lastRound = data.score[0].length
   $('#board').append($('<div>')
-    .text('Round :' + lastRound + ', Successes: ' + data.score[lastRound - 1][0] + ', Fails: ' + data.score[lastRound - 1][1])
+    .text('Round :' + lastRound + ', Successes: ' + data.score[0][lastRound - 1][0] + ', Fails: ' + data.score[0][lastRound - 1][1])
     .addClass('user'));
+    if(data.score[1][0] > 2){
+      $('#boardbutton').text('Knights of the Round Win!')
+    } else if(data.score[1][1] > 2){
+      $('#boardbutton').text('Spies Win!')
+    } else { 
+      $('#boardbutton').text(data.score[1][0] + ' missions succeeded, ' + data.score[1][1] + ' missions failed')
+    }
   }
   
   if(data.role){
@@ -118,7 +127,7 @@ $('#succeed').on('click', function(){
 });
 
 $('#fail').on('click', function(){
-  if(role === 'spy'){
+  if(role === 'Spy'){
     $('.run').fadeOut();
     socket.emit('run mission', 'no');
   }
